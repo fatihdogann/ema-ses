@@ -26,6 +26,15 @@ SPEEDS = (0.75, 0.9, 1, 1.25, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7)
 FFMPEG = shutil.which('ffmpeg') or next((str(path) for path in (Path('/opt/homebrew/bin/ffmpeg'), Path('/usr/local/bin/ffmpeg')) if path.is_file()), 'ffmpeg')
 
 
+def speech_text(text):
+    text = re.sub(r'!\[[^]]*\]\([^)]*\)', ' ', text)
+    text = re.sub(r'\[([^]]+)\]\([^)]*\)', r'\1', text)
+    text = re.sub(r'(?i)(?<![\w@])(?:https?://|www\.)[^\s)\]}>]+|(?<![\w@])(?:[a-z0-9-]+\.)+[a-z]{2,}(?:/[^\s)\]}>]*)?', ' ', text)
+    text = re.sub(r'\(\s*\)|\[\s*\]|<\s*>', ' ', text)
+    text = re.sub(r'(?m)^[ \t]*(?:[-+*]|#{1,6})[ \t]+', '', text)
+    return text.translate(str.maketrans('', '', '*_`~#')).strip()
+
+
 def audio_path(name):
     if not isinstance(name, str) or len(name) != 36 or not name.endswith(".wav") or any(c not in "0123456789abcdef" for c in name[:-4]):
         raise ValueError("Geçersiz ses dosyası.")
@@ -153,7 +162,10 @@ class Handler(BaseHTTPRequestHandler):
             start = time.perf_counter()
             if self.path == "/say":
                 text = payload.get("text")
-                if not isinstance(text, str) or not text.strip() or len(text) > 10000:
+                if not isinstance(text, str) or len(text) > 10000:
+                    raise ValueError("1–10.000 karakter arası bir metin yaz.")
+                text = speech_text(text)
+                if not text:
                     raise ValueError("1–10.000 karakter arası bir metin yaz.")
                 source = uuid.uuid4().hex + ".wav"
                 # ponytail: tek kullanıcı için sıralı üretim; çok kullanıcılı ihtiyaçta değişir.
