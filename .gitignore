@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+*.app/
+sesler/
+*.wav
+*.log
+.launch.lock
+.DS_Store
+.env
+.env.*
+# Kişisel kurulum yolları ve özel Tailscale adresi içeren yerel kullanım notu.
+KULLANIM.md

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="tr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EMA Ses · Türkçe metinden ses</title>
+<style>
+:root{color-scheme:light;font:17px system-ui;--bg:#f5f3ef;--text:#252925;--muted:#566057;--surface:#fff;--line:#a9b0a6;--accent:#244f3a;--button-text:#fff;--result:#e8eee6;background:var(--bg);color:var(--text)}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#151b18;--text:#edf2ec;--muted:#b3c0b4;--surface:#202a23;--line:#526858;--accent:#a7d1b1;--button-text:#132219;--result:#25362a}
+body{margin:0;padding:48px 20px}main{max-width:760px;margin:auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px}.tag{font-size:13px;letter-spacing:1.5px;color:var(--accent)}h1{font-size:40px;margin:18px 0}
+p{line-height:1.6;color:var(--muted)}label{display:block;margin:24px 0 8px;font-weight:600}
+textarea{box-sizing:border-box;width:100%;min-height:240px;resize:vertical;font:inherit;line-height:1.6;padding:18px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text)}
+button,select{font:inherit;padding:12px 16px;border-radius:8px;border:1px solid var(--line)}select{background:var(--surface);color:var(--text)}
+button{background:var(--accent);color:var(--button-text);border:0;cursor:pointer}button:disabled{opacity:.5;cursor:wait}
+.row{display:flex;align-items:end;gap:18px;flex-wrap:wrap;margin-bottom:22px}.row label{margin-top:20px}
+audio{display:block;width:100%;margin:16px 0}a{color:var(--accent)}#status{min-height:28px}
+#result{padding:8px 20px 24px;border-radius:12px;background:var(--result)}
+#download{display:inline-block;font-weight:600}footer{margin-top:36px;color:var(--muted);font-size:14px;line-height:1.7}
+#stop,#theme{background:transparent;color:var(--text);border:1px solid var(--line)}#stop{margin-top:16px}#theme{font-size:14px}
+@media(max-width:480px){body{padding:24px 16px}h1{font-size:32px}.row{align-items:stretch}.row>div,.row>button{width:100%}select{width:100%}}
+:focus-visible{outline:3px solid #b28b3d;outline-offset:3px}
+</style>
+<main><div class="top"><div class="tag">EMA SES</div><button id="theme" type="button" aria-label="Koyu temaya geç">Koyu tema</button></div><h1>Metnini sese dönüştür.</h1>
+<p>Türkçe metnini yaz, üret, buradan dinle. Beğendiğinde ses dosyasını indir.</p>
+<form id="form"><label for="text">Seslendirilecek metin</label>
+<textarea id="text" maxlength="10000" required placeholder="Türkçe metnini buraya yaz…"></textarea>
+<div class="row"><div><label for="speed">Dinleme ve indirme hızı</label>
+<select id="speed">
+<option value="0.75">0.75x · Yavaş</option><option value="0.9">0.9x · Biraz yavaş</option>
+<option value="1" selected>1x · Normal</option><option value="1.25">1.25x</option>
+<option value="2">2x</option><option value="2.5">2.5x</option><option value="3">3x</option>
+<option value="3.5">3.5x</option><option value="4">4x</option><option value="4.5">4.5x</option>
+<option value="5">5x</option><option value="5.5">5.5x</option><option value="6">6x</option>
+<option value="6.5">6.5x</option><option value="7">7x</option></select></div>
+<button id="generate">Ses üret</button></div></form>
+<p id="status" role="status" aria-live="polite">Hazır. Metnini yazabilirsin.</p>
+<section id="result" hidden aria-label="Üretilen ses"><audio id="audio" controls preload="metadata"></audio>
+<a id="download" download="ema-ses.wav">WAV dosyasını indir</a>
+<p style="font-size:14px;margin-bottom:0">Hızı değiştirince hem dinlediğin ses hem indireceğin dosya güncellenir.</p></section>
+<footer><strong>Mehmet Fatih Doğan</strong><br>Tek Türkçe ses · Yapay zekâ ile üretilmiştir.<br>
+Hız değişimi sesin tonunu korur. Yüksek hızlarda sözcükleri takip etmek zorlaşabilir.<br>
+<button id="stop" type="button">Uygulamayı kapat</button></footer></main>
+<script>
+const form=document.getElementById('form'),button=document.getElementById('generate');
+const status=document.getElementById('status'),audio=document.getElementById('audio');
+const speed=document.getElementById('speed'),download=document.getElementById('download'),stop=document.getElementById('stop');
+const theme=document.getElementById('theme');
+function applyTheme(value){document.documentElement.dataset.theme=value;const label=value==='dark'?'Açık tema':'Koyu tema';theme.textContent=label;theme.setAttribute('aria-label',label+'ya geç');}
+let savedTheme;try{savedTheme=localStorage.getItem('ema-theme');}catch(error){}
+applyTheme(savedTheme || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+theme.addEventListener('click',()=>{const value=document.documentElement.dataset.theme==='dark'?'light':'dark';applyTheme(value);try{localStorage.setItem('ema-theme',value);}catch(error){}});
+let source=null,busy=false;
+function setBusy(value){busy=value;button.disabled=value;speed.disabled=value;stop.disabled=value;}
+async function api(path,payload){
+  // Oturum anahtarını her işlemde yenile: eski sekmeler yeniden başlatmadan etkilenmez.
+  let response;
+  try{
+    const session=await fetch('/session',{cache:'no-store'});
+    if(!session.ok)throw Error('Oturum açılamadı.');
+    const {token}=await session.json();
+    response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json','X-EMA-Token':token},body:JSON.stringify(payload)});
+  }catch(error){throw Error('Siteye bağlanılamadı. Masaüstü → Projeler → EMA Ses içindeki uygulamaya çift tıkla.');}
+  const data=await response.json();
+  if(!response.ok)throw Error(data.error || 'Ses üretilemedi.');
+  return data;
+}
+function show(data){
+  source=data.source;audio.pause();audio.src=data.url;audio.load();
+  download.href=data.url.replace('/sesler/','/download/');download.download=`ema-ses-${data.speed}x.wav`;
+  document.getElementById('result').hidden=false;
+  status.textContent=`Ses hazır · ${data.speed}x · ${data.duration.toFixed(1)} saniye. Oynat düğmesinden dinleyebilir veya indirebilirsin.`;
+}
+form.addEventListener('submit',async event=>{
+  event.preventDefault();if(busy)return;setBusy(true);status.textContent='Ses üretiliyor…';
+  try{show(await api('/say',{text:document.getElementById('text').value,speed:Number(speed.value)}));}
+  catch(error){status.textContent=error.message;}
+  finally{setBusy(false);}
+});
+speed.addEventListener('change',async()=>{
+  if(!source || busy)return;setBusy(true);status.textContent='Sesin hızı değiştiriliyor…';
+  try{show(await api('/tempo',{source,speed:Number(speed.value)}));}
+  catch(error){status.textContent=error.message;}
+  finally{setBusy(false);}
+});
+stop.addEventListener('click',async()=>{
+  try{await api('/stop',{});audio.pause();setBusy(true);status.textContent='Uygulama kapandı. Yeniden açmak için EMA Ses uygulamasına çift tıkla.';}
+  catch(error){status.textContent=error.message;}
+});
+</script></html>
