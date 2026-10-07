@@ -22,7 +22,7 @@ OUTPUT = ROOT / "sesler"
 URL = "http://127.0.0.1:7868"
 TOKEN = secrets.token_urlsafe(32)
 LOCK = threading.Lock()
-SPEEDS = (0.75, 0.9, 1, 1.25, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7)
+SPEEDS = (0.5, 0.75, 0.9, 1, 1.25, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7)
 FFMPEG = shutil.which('ffmpeg') or next((str(path) for path in (Path('/opt/homebrew/bin/ffmpeg'), Path('/usr/local/bin/ffmpeg')) if path.is_file()), 'ffmpeg')
 
 

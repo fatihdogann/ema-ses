@@ -7,7 +7,7 @@ Türkçe metinleri sese dönüştüren, sesleri tarayıcıdan dinleyip WAV olara
 ## Özellikler
 
 - **Metinden ses:** Türkçe metni yaz, üret, oynatıcıdan dinle, istersen WAV indir.
-- **15 hız seçeneği:** 0.75x, 0.9x, 1x, 1.25x, 2x, 2.5x, 3x, 3.5x, 4x, 4.5x, 5x, 5.5x, 6x, 6.5x ve 7x.
+- **17 hız seçeneği:** 0.5x, 0.75x, 0.9x, 1x, 1.25x, 1.5x, 2x, 2.5x, 3x, 3.5x, 4x, 4.5x, 5x, 5.5x, 6x, 6.5x ve 7x.
 - **Üretim sonrası hız değişimi:** Tekrar ses üretmeden hızı değiştir; oynatıcı ve indirilen dosya birlikte güncellenir.
 - **Açık/koyu tema:** Sistem temasını izler, seçtiğin temayı tarayıcıda hatırlar.
 - **macOS uygulaması:** Finder’dan çift tıklayınca sunucu arka planda hazırlanır ve site açılır.
@@ -69,7 +69,7 @@ Uygulama açıkken:
 .venv/bin/python kontrol.py
 ```
 
-Kontrol; ses üretimini, 15 hızın sürelerini, 48 kHz mono WAV dosyalarını, HTTP Range/HEAD ve indirme yanıtlarını, giriş sınırlarını ve oturum anahtarını sınar.
+Kontrol; ses üretimini, 17 hızın sürelerini, 48 kHz mono WAV dosyalarını, HTTP Range/HEAD ve indirme yanıtlarını, giriş sınırlarını ve oturum anahtarını sınar.
 
 M4 / 16 GB macOS kurulumunda Finder çift tıkla açılış, yeniden başlatma sonrası eski sekmeden üretim, tarayıcı oynatımı, hız değişimi, WAV indirme, açık/koyu tema ve Tailscale HTTPS üzerinden üretim doğrulandı. Telefon genişliğinde görünüm test edildi; fiziksel iPhone kabulü ayrıca yapılmalıdır. Bu ölçümler ve kontroller tüm cihazlarda aynı performansı garanti etmez.
 

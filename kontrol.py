@@ -54,4 +54,4 @@ assert request({'source': result['source'], 'speed': 8}, route='/tempo')[0] == 4
 code, fast = request({'text': 'Türkçe metinleri yerel web sitesinde kolayca seslendirebiliriz.', 'speed': 7})
 assert code == 200 and fast['speed'] == 7 and fast['duration'] > 0
 print(json.dumps({'normal_seconds': result['duration'], 'all_speeds_seconds': durations}, ensure_ascii=False))
-print("Üretim, 15 hız, 7x doğrudan üretim, WAV, giriş sınırları ve erişim kontrolleri geçti.")
+print(f"Üretim, {len(SPEEDS)} hız, 7x doğrudan üretim, WAV, giriş sınırları ve erişim kontrolleri geçti.")
