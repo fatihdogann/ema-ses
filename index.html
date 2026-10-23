@@ -7,7 +7,7 @@
 :root{color-scheme:light;font:17px system-ui;--bg:#f5f3ef;--text:#252925;--muted:#566057;--surface:#fff;--line:#a9b0a6;--accent:#244f3a;--button-text:#fff;--result:#e8eee6;background:var(--bg);color:var(--text)}
 :root[data-theme="dark"]{color-scheme:dark;--bg:#151b18;--text:#edf2ec;--muted:#b3c0b4;--surface:#202a23;--line:#526858;--accent:#a7d1b1;--button-text:#132219;--result:#25362a}
 body{margin:0;padding:48px 20px}main{max-width:760px;margin:auto}
-.top{display:flex;align-items:center;justify-content:space-between;gap:16px}.tag{font-size:13px;letter-spacing:1.5px;color:var(--accent)}h1{font-size:40px;margin:18px 0}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.tag{font-size:13px;letter-spacing:1.5px;color:var(--accent)}.local{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--accent);background:var(--result);border-radius:999px;padding:4px 9px}.local::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}h1{font-size:40px;margin:18px 0}
 p{line-height:1.6;color:var(--muted)}label{display:block;margin:24px 0 8px;font-weight:600}
 textarea{box-sizing:border-box;width:100%;min-height:240px;resize:vertical;font:inherit;line-height:1.6;padding:18px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text)}
 button,select{font:inherit;padding:12px 16px;border-radius:8px;border:1px solid var(--line)}select{background:var(--surface);color:var(--text)}
@@ -20,8 +20,8 @@ audio{display:block;width:100%;margin:16px 0}a{color:var(--accent)}#status{min-h
 @media(max-width:480px){body{padding:24px 16px}h1{font-size:32px}.row{align-items:stretch}.row>div,.row>button{width:100%}select{width:100%}}
 :focus-visible{outline:3px solid #b28b3d;outline-offset:3px}
 </style>
-<main><div class="top"><div class="tag">EMA SES</div><button id="theme" type="button" aria-label="Koyu temaya geç">Koyu tema</button></div><h1>Metnini sese dönüştür.</h1>
-<p>Türkçe metnini yaz, üret, buradan dinle. Beğendiğinde ses dosyasını indir.</p>
+<main><div class="top"><div class="brand"><span class="tag">EMA SES</span><span class="local" title="İlk model indirmesinden sonra çevrimdışı çalışır; sesler buluta gitmez.">Yerel çalışır</span></div><button id="theme" type="button" aria-label="Koyu temaya geç">Koyu tema</button></div><h1>Metnini sese dönüştür.</h1>
+<p>Türkçe metnini yaz, üret; buradan dinle veya WAV olarak indir. Sesler buluta gitmez.</p>
 <form id="form"><label for="text">Seslendirilecek metin</label>
 <textarea id="text" maxlength="10000" required placeholder="Türkçe metnini buraya yaz…"></textarea>
 <div class="row"><div><label for="speed">Dinleme ve indirme hızı</label>
@@ -37,7 +37,7 @@ audio{display:block;width:100%;margin:16px 0}a{color:var(--accent)}#status{min-h
 <section id="result" hidden aria-label="Üretilen ses"><audio id="audio" controls preload="metadata"></audio>
 <a id="download" download="ema-ses.wav">WAV dosyasını indir</a>
 <p style="font-size:14px;margin-bottom:0">Hızı değiştirince hem dinlediğin ses hem indireceğin dosya güncellenir.</p></section>
-<footer><strong>Mehmet Fatih Doğan</strong><br>Tek Türkçe ses · Yapay zekâ ile üretilmiştir.<br>
+<footer><strong>Mehmet Fatih Doğan</strong><br>Tek Türkçe ses · EMA Lightning modeli kullanılır.<br>
 Hız değişimi sesin tonunu korur. Yüksek hızlarda sözcükleri takip etmek zorlaşabilir.<br>
 <button id="stop" type="button">Uygulamayı kapat</button></footer></main>
 <script>
