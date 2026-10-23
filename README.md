@@ -4,6 +4,8 @@ Türkçe metinleri sese dönüştüren, sesleri tarayıcıdan dinleyip WAV olara
 
 [EMA Lightning](https://huggingface.co/canberkkkkkk/ema-lightning) modelini kullanır. Modelin geliştiricisi **Canberk Aslan**; bu depo, modelin çevresindeki kullanım ekranını ve macOS başlatıcısını içerir.
 
+![EMA Ses arayüzü: metin alanı, hız seçici ve üretilen sesin oynatıcısı](docs/ekran.png)
+
 ## Özellikler
 
 - **Metinden ses:** Türkçe metni yaz, üret, oynatıcıdan dinle, istersen WAV indir.
