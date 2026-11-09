@@ -1,6 +1,5 @@
-"""Bu kurulum için Finder’dan açılabilen EMA Ses.app oluşturur."""
+"""Klasöründeki başlatıcıyı açan taşınabilir EMA Ses.app oluşturur."""
 import plistlib
-import shlex
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -15,10 +14,15 @@ def main():
             'CFBundleShortVersionString': '2.0', 'CFBundlePackageType': 'APPL',
             'CFBundleExecutable': 'EMA-Ses', 'LSUIElement': True}
     (app / 'Contents/Info.plist').write_bytes(plistlib.dumps(info))
-    executable.write_text('#!/bin/zsh\nexec ' + shlex.quote(str(ROOT / '.venv/bin/python'))
-                          + ' ' + shlex.quote(str(ROOT / 'launch.py')) + '\n')
+    executable.write_text(
+        '#!/bin/zsh\n'
+        'launcher="${0:A:h:h:h:h}/Baslat.command"\n'
+        'if [[ "$1" == "--no-browser" ]]; then exec "$launcher" "$@"; fi\n'
+        'exec /usr/bin/open -a Terminal "$launcher"\n',
+        encoding='utf-8',
+    )
     executable.chmod(0o755)
-    print(f'Hazır: {app}\nFinder’da çift tıklayarak açabilirsin. Kurulum klasörünü taşırsan bu komutu tekrar çalıştır.')
+    print(f'Hazır: {app}\nUygulamayı açmak için klasörü bir arada tut ve Finder’dan çift tıkla.')
 
 
 if __name__ == '__main__':

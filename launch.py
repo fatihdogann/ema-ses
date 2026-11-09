@@ -1,17 +1,19 @@
-"""Finder’dan çift tıklanınca sunucuyu arka planda açıp hazır ekranı göster."""
-import fcntl
+"""Yerel sunucuyu başlat ve hazır olduğunda tarayıcıyı aç."""
 import json
 import os
+import socket
 import subprocess
 import sys
 import time
-import urllib.error
 import urllib.request
 import webbrowser
 from pathlib import Path
 
+from filelock import FileLock, Timeout
+
 ROOT = Path(__file__).resolve().parent
 URL = "http://127.0.0.1:7868"
+LOG = ROOT / "uygulama.log"
 os.environ.setdefault('HF_HUB_DISABLE_TELEMETRY', '1')
 
 
@@ -29,22 +31,31 @@ def ensure_models():
 def ready():
     try:
         with urllib.request.urlopen(URL + "/health", timeout=1) as response:
-            return json.load(response).get("app") == "ema-lightning-local-v2"
-    except (OSError, ValueError, urllib.error.URLError):
+            data = json.load(response)
+            return isinstance(data, dict) and data.get("app") == "ema-lightning-local-v2" and data.get("ready") is True
+    except (OSError, ValueError):
         return False
 
 
 def main():
     # Çift tıklama ve ikinci açılış aynı sunucuyu kullanır.
-    with (ROOT / ".launch.lock").open("a") as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
+    with FileLock(str(ROOT / ".launch.lock"), timeout=300):
+        if not ready():
+            try:
+                with socket.create_connection(("127.0.0.1", 7868), timeout=1):
+                    if not ready():
+                        raise RuntimeError("7868 bağlantı noktası kullanımda. Kullanan uygulamayı kapatıp tekrar dene.")
+            except ConnectionRefusedError:
+                pass
         if not ready():
             ensure_models()
             env = dict(os.environ, HF_HUB_OFFLINE="1", HF_HUB_DISABLE_TELEMETRY="1")
-            with (ROOT / "uygulama.log").open("a") as log:
-                process = subprocess.Popen([str(ROOT / ".venv/bin/python"), "-u", str(ROOT / "app.py")],
+            background = ({"creationflags": subprocess.CREATE_NO_WINDOW} if os.name == "nt"
+                          else {"start_new_session": True})
+            with LOG.open("a", encoding="utf-8") as log:
+                process = subprocess.Popen([sys.executable, "-u", str(ROOT / "app.py")],
                                            cwd=ROOT, env=env, stdout=log, stderr=log,
-                                           stdin=subprocess.DEVNULL, start_new_session=True)
+                                           stdin=subprocess.DEVNULL, **background)
             for _ in range(180):
                 if ready():
                     break
@@ -53,11 +64,15 @@ def main():
                 time.sleep(0.5)
             else:
                 process.terminate()
+                process.wait(timeout=10)
                 raise RuntimeError("EMA hazırlığı tamamlanamadı; uygulama.log dosyasını kontrol et.")
-    if "--no-browser" not in sys.argv:
-        webbrowser.open(URL)
+    if "--no-browser" not in sys.argv and not webbrowser.open(URL):
+        print("Tarayıcı açılamadı. Şu adresi elle aç:", URL)
     print("EMA Ses hazır: " + URL)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (OSError, RuntimeError, Timeout) as error:
+        sys.exit(f"EMA Ses başlatılamadı: {error}")

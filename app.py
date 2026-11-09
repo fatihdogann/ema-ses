@@ -23,7 +23,16 @@ URL = "http://127.0.0.1:7868"
 TOKEN = secrets.token_urlsafe(32)
 LOCK = threading.Lock()
 SPEEDS = (0.5, 0.75, 0.9, 1, 1.25, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7)
-FFMPEG = shutil.which('ffmpeg') or next((str(path) for path in (Path('/opt/homebrew/bin/ffmpeg'), Path('/usr/local/bin/ffmpeg')) if path.is_file()), 'ffmpeg')
+try:
+    from imageio_ffmpeg import get_ffmpeg_exe
+except ImportError:
+    # Önceki kurulumlar sistemdeki FFmpeg ile çalışmaya devam eder.
+    FFMPEG = shutil.which("ffmpeg") or next(
+        (str(path) for path in (Path("/opt/homebrew/bin/ffmpeg"), Path("/usr/local/bin/ffmpeg")) if path.is_file()),
+        "ffmpeg",
+    )
+else:
+    FFMPEG = get_ffmpeg_exe()
 
 
 def speech_text(text):
@@ -66,7 +75,8 @@ def change_speed(source, speed):
         target = OUTPUT / (uuid.uuid4().hex + ".wav")
         subprocess.run([FFMPEG, "-nostdin", "-v", "error", "-i", str(original),
                         "-af", tempo_filter(speed), "-ar", "48000", "-ac", "1", str(target)],
-                       check=True, capture_output=True, timeout=180)
+                       check=True, capture_output=True, timeout=180,
+                       creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)
     with wave.open(str(target)) as wav:
         duration = wav.getnframes() / wav.getframerate()
     return {"url": "/sesler/" + target.name, "source": source, "duration": duration, "speed": speed}
