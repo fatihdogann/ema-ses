@@ -9,7 +9,7 @@ if errorlevel 1 (
     if not "%~1"=="--no-browser" pause
     exit /b 1
 )
-"%EMA_UV%" run --locked python launch.py %*
+"%EMA_UV%" run --locked python -X utf8 launch.py %*
 set "EMA_EXIT=%ERRORLEVEL%"
 if not "%EMA_EXIT%"=="0" if not "%~1"=="--no-browser" pause
 exit /b %EMA_EXIT%

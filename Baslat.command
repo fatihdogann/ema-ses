@@ -13,4 +13,4 @@ if [[ -z "$ema_uv" ]]; then
   print -u2 "uv bulunamadı. GitHub Releases'tan Mac paketini indir veya https://docs.astral.sh/uv/getting-started/installation/ adresinden uv'yi kur."
   exit 1
 fi
-exec "$ema_uv" run --locked python launch.py "$@"
+exec "$ema_uv" run --locked python -X utf8 launch.py "$@"

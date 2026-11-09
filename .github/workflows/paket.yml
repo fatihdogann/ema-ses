@@ -84,7 +84,7 @@ jobs:
               env = dict(os.environ, UV_OFFLINE='1', HF_HUB_OFFLINE='1') if offline else os.environ
               try:
                   subprocess.run([*launcher, '--no-browser'], cwd=root, env=env, check=True, timeout=360)
-                  subprocess.run([str(root / uv), 'run', '--locked', 'python', 'kontrol.py'], cwd=root, env=env, check=True)
+                  subprocess.run([str(root / uv), 'run', '--locked', 'python', '-X', 'utf8', 'kontrol.py'], cwd=root, env=env, check=True)
               except subprocess.SubprocessError:
                   if (root / 'uygulama.log').exists():
                       print((root / 'uygulama.log').read_text(encoding='utf-8', errors='replace')[-4000:])

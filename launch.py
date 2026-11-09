@@ -45,7 +45,7 @@ def main():
             background = ({"creationflags": subprocess.CREATE_NO_WINDOW} if os.name == "nt"
                           else {"start_new_session": True})
             with LOG.open("a", encoding="utf-8") as log:
-                process = subprocess.Popen([sys.executable, "-u", str(ROOT / "app.py")],
+                process = subprocess.Popen([sys.executable, "-X", "utf8", "-u", str(ROOT / "app.py")],
                                            cwd=ROOT, env=env, stdout=log, stderr=log,
                                            stdin=subprocess.DEVNULL, **background)
             for _ in range(180):

@@ -40,7 +40,7 @@ WAV kopyaları ve `uygulama.log`, Windows paketinde ve kaynak kurulumunda uygula
 ```sh
 git clone https://github.com/fatihdogann/ema-ses.git
 cd ema-ses
-uv run --locked python launch.py
+uv run --locked python -X utf8 launch.py
 ```
 
 Aynı komut iki platformda da çalışır. `Baslat.command` (macOS) veya `Baslat.bat` (Windows) ile de başlatabilirsin. Bağımlılık sürümleri `uv.lock` ile sabitlenir.
@@ -48,7 +48,7 @@ Aynı komut iki platformda da çalışır. `Baslat.command` (macOS) veya `Baslat
 Uygulama açıkken şu komutla Türkçe ses üretimini, 17 hızın WAV sürelerini ve indirme yanıtlarını denetleyebilirsin.
 
 ```sh
-uv run --locked python kontrol.py
+uv run --locked python -X utf8 kontrol.py
 ```
 
 ## Açılış sorunları
