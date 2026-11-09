@@ -25,7 +25,7 @@ macOS paketi Apple tarafından noter onayından geçirilmemiştir. macOS açıl�
 ## Kullanım
 
 1. Türkçe metni yaz ve **Ses üret** düğmesine bas.
-2. Oynatıcıdan dinle. Hızı sonradan değiştirdiğinde model metni yeniden seslendirmez.
+2. Oynatıcıdan dinle. Daha önce seçtiğin bir hıza dönersen EMA Ses hazır WAV dosyasını yeniden kullanır.
 3. **WAV dosyasını indir** ile seçili hızdaki sesi kaydet.
 4. İşin bittiğinde **Uygulamayı kapat** düğmesine bas. Tarayıcı sekmesini kapatmak yerel sunucuyu durdurmaz.
 

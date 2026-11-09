@@ -59,7 +59,7 @@ async function api(path,payload){
     if(!session.ok)throw Error('Oturum açılamadı.');
     const {token}=await session.json();
     response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json','X-EMA-Token':token},body:JSON.stringify(payload)});
-  }catch(error){throw Error('Siteye bağlanılamadı. Masaüstü → Projeler → EMA Ses içindeki uygulamaya çift tıkla.');}
+  }catch(error){throw Error('EMA Ses’e bağlanılamadı. Paketteki EMA Ses başlatıcısını yeniden aç, ardından bu sayfayı yenile.');}
   const data=await response.json();
   if(!response.ok)throw Error(data.error || 'Ses üretilemedi.');
   return data;

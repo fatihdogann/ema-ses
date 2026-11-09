@@ -40,6 +40,7 @@ with urllib.request.urlopen(req) as response:
     assert 'attachment' in response.headers['Content-Disposition'] and response.read() == audio
 from app import SPEEDS
 durations = {}
+tempo_url = None
 for speed in SPEEDS:
     code, changed = request({'source': result['source'], 'speed': speed}, route='/tempo')
     assert code == 200, changed
@@ -49,9 +50,13 @@ for speed in SPEEDS:
         assert wav.getframerate() == 48000 and wav.getnchannels() == 1
         assert duration > 0 and abs(duration - result['duration'] / speed) < 0.18, (speed, duration)
     durations[str(speed)] = round(duration, 3)
+    if speed == 1.5:
+        tempo_url = changed['url']
+code, repeated = request({'source': result['source'], 'speed': 1.5}, route='/tempo')
+assert code == 200 and repeated['url'] == tempo_url, repeated
 assert request({'source': '../app.py', 'speed': 1}, route='/tempo')[0] == 400
 assert request({'source': result['source'], 'speed': 8}, route='/tempo')[0] == 400
 code, fast = request({'text': 'Türkçe metinleri yerel web sitesinde kolayca seslendirebiliriz.', 'speed': 7})
 assert code == 200 and fast['speed'] == 7 and fast['duration'] > 0
 print(json.dumps({'normal_seconds': result['duration'], 'all_speeds_seconds': durations}, ensure_ascii=False))
-print(f"Üretim, {len(SPEEDS)} hız, 7x doğrudan üretim, WAV, giriş sınırları ve erişim kontrolleri geçti.")
+print(f"Üretim, {len(SPEEDS)} hız, WAV yeniden kullanımı, 7x üretim, giriş sınırları ve erişim kontrolleri geçti.")

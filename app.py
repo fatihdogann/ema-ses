@@ -22,6 +22,7 @@ OUTPUT = ROOT / "sesler"
 URL = "http://127.0.0.1:7868"
 TOKEN = secrets.token_urlsafe(32)
 LOCK = threading.Lock()
+TEMPO_LOCK = threading.Lock()
 SPEEDS = (0.5, 0.75, 0.9, 1, 1.25, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7)
 try:
     from imageio_ffmpeg import get_ffmpeg_exe
@@ -72,11 +73,21 @@ def change_speed(source, speed):
     original = audio_path(source)
     target = original
     if speed != 1:
-        target = OUTPUT / (uuid.uuid4().hex + ".wav")
-        subprocess.run([FFMPEG, "-nostdin", "-v", "error", "-i", str(original),
-                        "-af", tempo_filter(speed), "-ar", "48000", "-ac", "1", str(target)],
-                       check=True, capture_output=True, timeout=180,
-                       creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)
+        key = uuid.uuid5(uuid.UUID(hex=original.stem), f"tempo:{speed:g}")
+        target = OUTPUT / (key.hex + ".wav")
+        with TEMPO_LOCK:
+            if not target.is_file():
+                temporary = target.with_suffix(".tmp")
+                try:
+                    subprocess.run(
+                        [FFMPEG, "-nostdin", "-v", "error", "-y", "-i", str(original),
+                         "-af", tempo_filter(speed), "-ar", "48000", "-ac", "1", "-f", "wav", str(temporary)],
+                        check=True, capture_output=True, timeout=180,
+                        creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+                    )
+                    temporary.replace(target)
+                finally:
+                    temporary.unlink(missing_ok=True)
     with wave.open(str(target)) as wav:
         duration = wav.getnframes() / wav.getframerate()
     return {"url": "/sesler/" + target.name, "source": source, "duration": duration, "speed": speed}
