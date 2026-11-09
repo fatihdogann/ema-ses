@@ -38,22 +38,18 @@ jobs:
 
           root = pathlib.Path('dist', 'EMA Ses')
           root.mkdir(parents=True)
-          for name in ('app.py', 'index.html', 'launch.py', 'pyproject.toml', 'uv.lock', 'LICENSE'):
-              shutil.copy2(name, root / name)
           if sys.platform == 'darwin':
-              for name in ('Baslat.command', 'uygulama_olustur.py'):
-                  shutil.copy2(name, root / name)
-              subprocess.run([sys.executable, 'uygulama_olustur.py'], cwd=root, check=True)
-              (root / 'uygulama_olustur.py').unlink()
-              uv_name = 'uv'
+              subprocess.run([sys.executable, 'uygulama_olustur.py', str(root)], check=True)
+              licenses = root / 'EMA Ses.app/Contents/Resources'
           else:
-              shutil.copy2('Baslat.bat', root / 'Baslat.bat')
-              uv_name = 'uv.exe'
-          shutil.copy2(shutil.which(uv_name), root / uv_name)
+              for name in ('app.py', 'index.html', 'launch.py', 'pyproject.toml', 'uv.lock', 'LICENSE', 'Baslat.bat'):
+                  shutil.copy2(name, root / name)
+              shutil.copy2(shutil.which('uv.exe'), root / 'uv.exe')
+              licenses = root
           version = os.environ['UV_VERSION']
           urllib.request.urlretrieve(
               f'https://raw.githubusercontent.com/astral-sh/uv/{version}/LICENSE-MIT',
-              root / 'LICENSE-uv',
+              licenses / 'LICENSE-uv',
           )
           shutil.make_archive(f"dist/EMA-Ses-{os.environ['EMA_PLATFORM']}", 'zip', 'dist', 'EMA Ses')
           PY
@@ -71,13 +67,17 @@ jobs:
           package = pathlib.Path('dist', f"EMA-Ses-{os.environ['EMA_PLATFORM']}.zip")
           if sys.platform == 'darwin':
               subprocess.run(['ditto', '-x', '-k', str(package), 'deneme'], check=True)
-              launcher = [str(pathlib.Path('deneme/EMA Ses/EMA Ses.app/Contents/MacOS/EMA-Ses').resolve())]
+              shutil.move('deneme/EMA Ses/EMA Ses.app', 'deneme/EMA Ses.app')
+              launcher = [str(pathlib.Path('deneme/EMA Ses.app/Contents/MacOS/EMA-Ses').resolve())]
+              root = pathlib.Path('deneme', 'runtime').resolve()
+              os.environ['EMA_RUNTIME_DIR'] = str(root)
               uv = 'uv'
           else:
               shutil.unpack_archive(package, 'deneme')
               launcher = ['cmd.exe', '/d', '/c', 'Baslat.bat']
+              root = pathlib.Path('deneme', 'EMA Ses').resolve()
               uv = 'uv.exe'
-          root = pathlib.Path('deneme', 'EMA Ses').resolve()
+          root.mkdir(exist_ok=True)
           shutil.copy2('kontrol.py', root / 'kontrol.py')
           url = 'http://127.0.0.1:7868'
           for offline in (False, True):

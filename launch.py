@@ -1,7 +1,6 @@
 """Yerel sunucuyu başlat ve hazır olduğunda tarayıcıyı aç."""
 import json
 import os
-import socket
 import subprocess
 import sys
 import time
@@ -40,13 +39,6 @@ def ready():
 def main():
     # Çift tıklama ve ikinci açılış aynı sunucuyu kullanır.
     with FileLock(str(ROOT / ".launch.lock"), timeout=300):
-        if not ready():
-            try:
-                with socket.create_connection(("127.0.0.1", 7868), timeout=1):
-                    if not ready():
-                        raise RuntimeError("7868 bağlantı noktası kullanımda. Kullanan uygulamayı kapatıp tekrar dene.")
-            except ConnectionRefusedError:
-                pass
         if not ready():
             ensure_models()
             env = dict(os.environ, HF_HUB_OFFLINE="1", HF_HUB_DISABLE_TELEMETRY="1")

@@ -16,7 +16,9 @@
 | macOS 14 ve üzeri · Apple Silicon (M serisi) | `EMA-Ses-macOS-arm64.zip` | **EMA Ses.app** |
 | Windows · x64 (Intel veya AMD) | `EMA-Ses-Windows-x64.zip` | **Baslat.bat** |
 
-Çıkardığın **EMA Ses** klasöründeki dosyaları birlikte tut. İlk açılışta başlatıcı Python'u, ses işleme bağımlılıklarını ve modeli indirir. Kurulum tamamlanınca varsayılan tarayıcıda `http://127.0.0.1:7868` açılır. Sonraki açılışlarda internet gerekmez. İlk kurulumun ilerlemesini açılan komut penceresinde görebilirsin.
+Mac'te **EMA Ses.app** dosyasını istersen **Uygulamalar** klasörüne taşı. Windows'ta çıkardığın **EMA Ses** klasöründeki dosyaları birlikte tut.
+
+İlk açılışta başlatıcı Python'u, ses işleme bağımlılıklarını ve modeli indirir. Kurulum tamamlanınca varsayılan tarayıcıda `http://127.0.0.1:7868` açılır. Sonraki açılışlarda internet gerekmez. İlk kurulumun ilerlemesini açılan komut penceresinde görebilirsin.
 
 macOS paketi Apple tarafından noter onayından geçirilmemiştir. macOS açılışı engellerse, paketi bu deponun Releases sayfasından indirdiğini doğrula ve [Apple'ın açma adımlarını](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unidentified-developer-mh40616/mac) izle.
 
@@ -27,7 +29,9 @@ macOS paketi Apple tarafından noter onayından geçirilmemiştir. macOS açıl�
 3. **WAV dosyasını indir** ile seçili hızdaki sesi kaydet.
 4. İşin bittiğinde **Uygulamayı kapat** düğmesine bas. Tarayıcı sekmesini kapatmak yerel sunucuyu durdurmaz.
 
-Uygulama 17 hız seçeneği, sistem temasını izleyen açık ve koyu görünüm ve tek bir Türkçe ses sunar. Tek istekte en fazla 10.000 karakter kabul eder. Üretilen dosyaların yerel kopyaları uygulama klasöründeki `sesler/` dizinine yazılır. Metin ve ses üretim için bir sunucuya gönderilmez.
+Uygulama 17 hız seçeneği, sistem temasını izleyen açık ve koyu görünüm ve tek bir Türkçe ses sunar. Tek istekte en fazla 10.000 karakter kabul eder. Metin ve ses üretim için bir sunucuya gönderilmez.
+
+WAV kopyaları ve `uygulama.log`, Windows paketinde ve kaynak kurulumunda uygulama klasöründe tutulur. Mac paketinde bu dosyalar `~/Library/Application Support/EMA Ses/` altındadır. WAV kopyalarını ilgili klasörün `sesler/` dizininde bulabilirsin.
 
 ## Kaynak koddan çalıştır
 
@@ -51,7 +55,7 @@ uv run --locked python kontrol.py
 
 - **Tarayıcı açılmadıysa** komut penceresindeki mesajı kontrol et. `EMA Ses hazır` yazıyorsa `http://127.0.0.1:7868` adresini elle aç.
 - **İlk indirme yarıda kaldıysa** internet bağlantısını kontrol edip başlatıcıyı yeniden aç. Model ve kurulum dosyaları önbellekte yeniden kullanılır.
-- **Ses üretimi veya açılış başarısızsa** uygulama klasöründeki `uygulama.log` dosyasını kontrol et. Hata bildirirken işletim sistemini ve hata satırını ekle.
+- **Ses üretimi veya açılış başarısızsa** yukarıdaki konumda `uygulama.log` dosyasını kontrol et. Hata bildirirken işletim sistemini ve hata satırını ekle.
 
 Kendi özel ağındaki başka bir cihazdan erişmek için [Tailscale Serve](https://tailscale.com/docs/features/tailscale-serve) ile `127.0.0.1:7868` adresini paylaşabilirsin. Uygulamanın çalıştığı bilgisayar açık ve erişilebilir olmalıdır.
 
